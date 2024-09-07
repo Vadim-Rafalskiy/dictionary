@@ -1,78 +1,47 @@
+const { ctrlWrapper } = require('../utils');
+
 const words = require('../data');
+
 const { HttpError } = require('../helpers');
-const Joi = require('joi');
 
-const addShema = Joi.object({
-    pl: Joi.string().required(),
-    uk: Joi.string().required(),
-    serf: Joi.string().required(),
-    partOfSpeech: Joi.string().required(),
-});
-
-const getWords = async (req, res) => {
-    try {
-        const allWords = await words.getAll();
-        res.json(allWords);
-    } catch (error) {
-        next(error);
-    }
+const getAllWords = async (req, res) => {
+    const allWords = await words.getAll();
+    res.json(allWords);
 };
 
-const getWordById = async (req, res, next) => {
+const getWordById = async (req, res) => {
     const { id } = req.params;
 
-    try {
-        const word = await words.getById(id);
-        if (!word) throw HttpError(404);
-        res.json(word);
-    } catch (error) {
-        next(error);
-    }
+    const word = await words.getById(id);
+    if (!word) throw HttpError(404);
+    res.json(word);
 };
 
-const addWord = async (req, res, next) => {
-    try {
-        const { error } = addShema.validate(req.body);
-        if (error) throw HttpError(400, error.message);
-
-        const newWord = await words.add(req.body);
-        res.status(201).json(newWord);
-    } catch (error) {
-        next(error);
-    }
+const addWord = async (req, res) => {
+    const newWord = await words.add(req.body);
+    res.status(201).json(newWord);
 };
 
-const updateWord = async (req, res, next) => {
+const updateWordById = async (req, res) => {
     const { id } = req.params;
 
-    try {
-        const { error } = addShema.validate(req.body);
-        if (error) throw HttpError(400, error.message);
-
-        const updatedWord = await words.updateById(id, req.body);
-        if (!updatedWord) throw HttpError(404);
-        res.json(updatedWord);
-    } catch (error) {
-        next(error);
-    }
+    const updatedWord = await words.updateById(id, req.body);
+    if (!updatedWord) throw HttpError(404);
+    res.json(updatedWord);
 };
 
-const deleteWord = async (req, res, next) => {
+const deleteWordById = async (req, res) => {
     const { id } = req.params;
 
-    try {
-        const deletedWord = await words.deleteById(id);
-        if (!deletedWord) throw HttpError(404);
-        res.json(deletedWord);
-    } catch (error) {
-        next(error);
-    }
+    const deletedWord = await words.deleteById(id);
+    if (!deletedWord) throw HttpError(404);
+    res.json(deletedWord);
 };
 
 module.exports = {
-    getWords,
-    getWordById,
-    addWord,
-    updateWord,
-    deleteWord,
+    getAllWords: ctrlWrapper(getAllWords),
+    getWordById: ctrlWrapper(getWordById),
+    addWord: ctrlWrapper(addWord),
+    updateWordById: ctrlWrapper(updateWordById),
+    deleteWordById: ctrlWrapper(deleteWordById),
 };

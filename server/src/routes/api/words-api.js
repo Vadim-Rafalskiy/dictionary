@@ -3,14 +3,17 @@ const router = express.Router();
 
 const ctrl = require('../../../controllers/ctrl-words');
 
-router.get('/', ctrl.getWords);
+const { validateBody } = require('../../../utils');
+const schemas = require('../../../schemas/wordsJoiSchema');
+
+router.get('/', ctrl.getAllWords);
 
 router.get('/:id', ctrl.getWordById);
 
-router.post('/', ctrl.addWord);
+router.post('/', validateBody(schemas.addSchema), ctrl.addWord);
 
-router.put('/:id', ctrl.updateWord);
+router.put('/:id', validateBody(schemas.addSchema), ctrl.updateWordById);
 
-router.delete('/:id', ctrl.deleteWord);
+router.delete('/:id', ctrl.deleteWordById);
 
 module.exports = router;
